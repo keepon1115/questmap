@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLAFT - クエストマップ 改修版</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #4DB6F7;
+            --accent-green: #8EE38F;
+            --bg-warm-white: #FFFEF5;
+            --text-dark: #2C3E50;
+            --text-light: #6B7280;
+            --shadow-soft: rgba(0, 0, 0, 0.08);
+            --cta-red: #FF6B6B;
+            --disabled-gray: #D1D5DB;
+            /* デザイン定数で指定されたシャドウ */
+            --shadow-design-spec: rgba(0,0,0,.05);
+            /* ボタン角丸 */
+            --button-border-radius: 24px;
+            --element-border-radius: 10px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            /* ▼ 2. 背景・演出: ページ全体にワクワク感を持たせるグラデーション背景に変更 */
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 60%, #e0f2fe 100%); /* 空や冒険をイメージ */
+            /* background: linear-gradient(180deg, #E0F2FE 0%, #FEF3C7 100%); 元の背景 */
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden; /* ハンバーガーメニュー表示時の横スクロール防止 */
+        }
+
+        .heading-primary { 
+            font-family: 'M PLUS Rounded 1c', sans-serif; 
+            font-weight: 900;
+        }
+        
+        .heading-secondary { 
+            font-family: 'M PLUS Rounded 1c', sans-serif; 
+            font-weight: 700;
+        }
+
+        /* ヘッダー */
+        .map-header {
+            background: white;
+            padding: 15px 20px; /* 少し高さを調整 */
+            box-shadow: 0 2px 8px var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: sticky; /* スクロール追従 */
+            top: 0;
+            z-index: 900; /* 他の要素より手前 */
+        }
+
+        .home-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: var(--element-border-radius); /* 10px */
+            cursor: pointer;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .home-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .map-title {
+            font-size: 24px;
+            margin: 0;
+            margin-left: 10px; /* ハンバーガーメニュー分 */
+        }
+
+        /* マップエリア */
+        .map-scroll-wrapper {
+            overflow-x: auto;
+            padding: 40px 0px; /* 左右パディングは map-container で制御 */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .map-path {
+            display: flex;
+            align-items: flex-start; /* ステージの高さが異なる場合を考慮 */
+            min-width: 1400px; /* PCでの横スクロール用 */
+            padding: 40px 20px; /* PCでの左右余白 */
+        }
+
+        /* ステージノード */
+        .stage-wrapper {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0; /* SPで縮まないように */
+        }
+
+        .stage-node {
+            position: relative;
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            gap: 8px;
+            padding-top: 12px;
+        }
+
+        .stage-node:hover {
+            transform: scale(1.05); /* 既存のhover効果を少し抑えめにする */
+        }
+
+        .stage-icon { /* 既存のスタイルを流用しつつ調整 */
+            width: 48px;
+            height: 48px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stage-node.completed .stage-icon { background: none; box-shadow: none; }
+        .stage-node.current .stage-icon { background: none; box-shadow: none; animation: none; }
+        .stage-node.locked .stage-icon { background: none; opacity: 1; }
+
+
+        .stage-number-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            background: white;
+            color: var(--text-dark);
+            box-shadow: 0 2px 8px var(--shadow-design-spec); /* 指定シャドウ */
+            position: relative;
+            z-index: 3;
+        }
+        
+        .stage-node.completed .stage-number-badge {
+            background: var(--accent-green);
+            color: white;
+            box-shadow: 0 0 12px rgba(142, 227, 143, 0.4);
+        }
+        
+        .stage-node.current .stage-number-badge {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 0 16px rgba(77, 182, 247, 0.5);
+            animation: pulse-badge 2s infinite;
+        }
+        
+        .stage-node.locked .stage-number-badge {
+            background: var(--disabled-gray);
+            color: white;
+            opacity: 0.7;
+        }
+        
+        @keyframes pulse-badge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .stage-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: var(--element-border-radius); /* 10px */
+            box-shadow: 0 2px 8px var(--shadow-design-spec); /* 指定シャドウ */
+        }
+                
+        .stage-node.locked .stage-icon-wrapper {
+            opacity: 0.5;
+            filter: grayscale(100%);
+        }
+        
+        .stage-number { display: none; } /* 元のステージ番号は非表示 */
+        
+        .current-marker {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-blue);
+            color: white;
+            padding: 4px 12px;
+            border-radius: var(--element-border-radius); /* 10px */
+            font-size: 12px;
+            font-weight: 700;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) translateX(-50%); }
+            50% { transform: translateY(-5px) translateX(-50%); }
+        }
+
+        /* パスライン */
+        .path-line {
+            width: 100px;
+            height: 4px;
+            background: #D1D5DB;
+            z-index: 1;
+            position: relative;
+            border-radius: 2px;
+        }
+
+        .path-line.completed { background: var(--accent-green); }
+        .path-line.current { background: linear-gradient(90deg, var(--accent-green) 0%, #D1D5DB 100%); }
+
+        /* クエスト開始ボタン */
+        .quest-start-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: var(--cta-red);
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            padding: 20px 40px;
+            border-radius: var(--button-border-radius); /* 24px */
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.4);
+            animation: float 3s ease-in-out infinite;
+            z-index: 100;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; /* ホバーアニメーション用 */
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ▼ 2. 背景・演出: ボタンホバーアニメーション */
+        .quest-start-btn:hover {
+            transform: scale(1.05) translateY(-3px); /* Bounce */
+            box-shadow: 0 12px 32px rgba(255, 107, 107, 0.6), /* Enhanced existing shadow */
+                        0 0 15px rgba(255, 107, 107, 0.7); /* Glow with CTA red */
+        }
+
+        .sword-icon { font-size: 24px; }
+
+        /* モーダル */
+        .stage-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px; /* SPでの端の余白 */
+        }
+
+        .stage-modal.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--element-border-radius); /* 10pxに変更 (元24px) */
+            padding: 32px;
+            max-width: 500px;
+            width: 100%; /* paddingで制御 */
+            box-shadow: 0 20px 40px var(--shadow-design-spec); /* 指定シャドウ */
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #F3F4F6;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--cta-red);
+            color: white;
+        }
+
+        /* ▼ 3. ステージポップアップ: モーダル内要素変更 */
+        .stage-title { /*流用*/
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .stage-modal-message { /* 新規: 説明文用 */
+            color: var(--text-light);
+            margin-bottom: 24px;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .modal-actions { /* 新規: ボタンコンテナ */
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .modal-action-btn { /* 新規: モーダル内ボタン共通スタイル */
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: var(--button-border-radius); /* 24px */
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+            text-align: center;
+        }
+
+        .modal-action-btn.video-btn {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        .modal-action-btn.quest-btn {
+            background-color: var(--accent-green);
+            color: white;
+        }
+        
+        /* ▼ 2. 背景・演出: モーダルボタンホバーアニメーション */
+        .modal-action-btn:hover {
+            transform: scale(1.05) translateY(-2px); /* Bounce */
+            box-shadow: 0 4px 12px var(--shadow-design-spec), /* Base Shadow */
+                        0 0 10px currentColor; /* Glow with button's own color */
+        }
+        /* ▲ 3. ステージポップアップここまで */
+        
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .quest-start-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                font-size: 16px;
+            }
+            .map-title {
+                font-size: 20px; /* SPでは少し小さく */
+            }
+            /* ▼ 3. ステージポップアップ: モーダルボタン縦積み */
+            .modal-actions {
+                flex-direction: column;
+            }
+            /* ▼ 5. レイアウト調整: SP */
+            .map-container {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            .map-scroll-wrapper {
+                padding-top: 20px; /* 上パディング調整 */
+                padding-bottom: 20px; /* 下パディング調整 */
+                overflow-x: hidden; /* SPでは横スクロールさせない */
+            }
+            .map-path {
+                min-width: 100%; /* SPでは横幅いっぱい */
+                flex-wrap: wrap;
+                justify-content: space-around; /* 要素間のスペースを均等に */
+                padding: 0; /* map-container側で制御 */
+            }
+            .stage-wrapper {
+                flex-basis: calc(50% - 10px); /* 2カラム。10pxはwrapper間のマージン想定 */
+                margin-bottom: 30px; /* 行間のマージン */
+                /* 奇数番目と偶数番目で左右に振ることでジグザグ感を出す */
+            }
+            .stage-wrapper:nth-child(odd) {
+                padding-right: 5%; /* 右のスペース */
+            }
+            .stage-wrapper:nth-child(even) {
+                padding-left: 5%; /* 左のスペース */
+            }
+
+            .path-line {
+                width: 30px; /* SPではパスを短く */
+            }
+            /* 各行の右端(偶数番目)のステージのパスは、次(下)のステージへ接続するイメージなので、線を非表示 or 見た目変更 */
+            /* 今回はシンプルにそのまま表示 */
+            /* .stage-wrapper:nth-child(2n):not(:last-child) .path-line {
+                display: none; 
+            } */
+        }
+
+        /* ========== ここから改修追加スタイル ========== */
+        
+        /* 既存の改修スタイルは上記に統合または調整 */
+        .banner-bg, .map-footer-bg { display: none; } /* 今回は不要なので非表示 */
+        
+        .map-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* ▼ 1. ハンバーガーメニュー */
+        .hamburger-menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1010; /* ナビより手前 */
+            display: flex; /* 아이콘 중앙 정렬을 위해 */
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            position: absolute; /* ヘッダー左上に配置 */
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .hamburger-icon {
+            width: 24px;
+            height: 18px;
+            position: relative;
+        }
+
+        .hamburger-icon span {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: var(--text-dark);
+            border-radius: 3px;
+            opacity: 1;
+            left: 0;
+            transition: .25s ease-in-out;
+        }
+        .hamburger-icon span:nth-child(1) { top: 0px; }
+        .hamburger-icon span:nth-child(2) { top: 7px; }
+        .hamburger-icon span:nth-child(3) { top: 14px; }
+
+        .nav-open .hamburger-icon span:nth-child(1) {
+            top: 7px;
+            transform: rotate(135deg);
+        }
+        .nav-open .hamburger-icon span:nth-child(2) {
+            opacity: 0;
+            left: -24px;
+        }
+        .nav-open .hamburger-icon span:nth-child(3) {
+            top: 7px;
+            transform: rotate(-135deg);
+        }
+
+        .main-nav {
+            position: fixed;
+            top: 0;
+            left: -100%; /* 初期状態では画面外 */
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(5px);
+            z-index: 1005; /* ヘッダーより手前、ボタンより奥 */
+            transition: left 0.3s ease-in-out;
+            padding-top: 80px; /* ヘッダーの高さ分オフセット */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main-nav.nav-open {
+            left: 0;
+        }
+
+        .main-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .main-nav li a {
+            display: block;
+            padding: 20px 30px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        .main-nav li:last-child a {
+            border-bottom: none;
+        }
+        .main-nav li a:hover {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        /* PCでのハンバーガーメニューのスタイル */
+        @media (min-width: 769px) {
+            .main-nav {
+                width: 260px; /* PCでは幅260pxのサイドパネル */
+                left: -260px; /* 初期状態では画面外 */
+                box-shadow: 2px 0 10px var(--shadow-design-spec);
+            }
+            .main-nav.nav-open {
+                left: 0;
+            }
+            .main-nav li a {
+                text-align: left;
+            }
+        }
+        /* ▲ 1. ハンバーガーメニューここまで */
+
+        /* ========== 改修追加スタイルここまで ========== */
+
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="map-header">
+        <!-- ▼ 1. ハンバーガーメニューボタン -->
+        <button class="hamburger-menu-btn" id="hamburgerBtn" aria-label="メニューを開く" aria-expanded="false">
+            <div class="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+        <!-- ▲ 1. ハンバーガーメニューボタン -->
+        <button class="home-btn" aria-label="ホームに戻る" onclick="location.href='#'">🏠</button> <!-- 仮のリンク -->
+        <h1 class="map-title heading-primary">クエストマップ</h1>
+    </header>
+
+    <!-- ▼ 1. ハンバーガーナビゲーション -->
+    <nav class="main-nav" id="mainNav">
+        <ul>
+            <li><a href="#">ホーム</a></li>
+            <li><a href="#">ジブンクラフト</a></li>
+            <li><a href="#">クエスト</a></li>
+            <li><a href="#">Yononaka</a></li>
+            <li><a href="#">ミライクラフト</a></li>
+        </ul>
+    </nav>
+    <!-- ▲ 1. ハンバーガーナビゲーション -->
+
+
+    <!-- マップコンテナ -->
+    <div class="map-container">
+        <!-- マップエリア -->
+        <div class="map-scroll-wrapper">
+            <div class="map-path">
+                <!-- ステージ1 -->
+                <div class="stage-wrapper">
+                    <div class="stage-node completed" onclick="openModal(1)" aria-label="ステージ1: 君はどんな冒険者？">
+                        <div class="stage-number-badge">1</div>
+                        <div class="stage-icon-wrapper">
+                            <div class="stage-icon">🌍</div>
+                        </div>
+                        <div class="stage-name">君はどんな冒険者？</div>
+                    </div>
+                    <div class="path-line completed"></div>
+                </div>
+
+                <!-- ステージ2 -->
+                <div class="stage-wrapper">
+                    <div class="stage-node completed" onclick="openModal(2)" aria-label="ステージ2: ワクもやエネルギー">
+                        <div class="stage-number-badge">2</div>
+                        <div class="stage-icon-wrapper">
+                            <div class="stage-icon">💡</div>
+                        </div>
+                        <div class="stage-name">ワクもやエネルギー</div>
+                    </div>
+                    <div class="path-line current"></div>
+                </div>
+
+                <!-- ステージ3（現在地） -->
+                <div class="stage-wrapper">
+                    <div class="stage-node current" onclick="openModal(3)" aria-label="ステージ3: 君はどんなキャラ？（現在地）">
+                        <div class="current-marker">現在地</div>
+                        <div class="stage-number-badge">3</div>
+                        <div class="stage-icon-wrapper">
+                            <div class="stage-icon">👤</div>
+                        </div>
+                        <div class="stage-name">君はどんなキャラ？</div>
+                    </div>
+                    <div class="path-line"></div>
+                </div>
+
+                <!-- ステージ4 -->
+                <div class="stage-wrapper">
+                    <div class="stage-node locked" onclick="openModal(4)" aria-label="ステージ4: どんな道具を持ってる？（未開放）">
+                        <div class="stage-number-badge">4</div>
+                        <div class="stage-icon-wrapper">
+                            <div class="stage-icon">🛠️</div>
+                        </div>
+                        <div class="stage-name">どんな道具を持ってる？</div>
+                    </div>
+                    <div class="path-line"></div>
+                </div>
+
+                <!-- ステージ5 -->
+                <div class="stage-wrapper">
+                    <div class="stage-node locked" onclick="openModal(5)" aria-label="ステージ5: 仲間と冒険するって？（未開放）">
+                        <div class="stage-number-badge">5</div>
+                        <div class="stage-icon-wrapper">
+                            <div class="stage-icon">🤝</div>
+                        </div>
+                        <div class="stage-name">仲間と冒険するって？</div>
+                    </div>
+                    <div class="path-line"></div>
+                </div>
+
+                <!-- ステージ6 -->
+                <div class="stage-wrapper">
+                    <div class="stage-node locked" onclick="openModal(6)" aria-label="ステージ6: 未来のボスと向き合う（未開放）">
+                        <div class="stage-number-badge">6</div>
+                        <div class="stage-icon-wrapper">
+                            <div class="stage-icon">🎯</div>
+                        </div>
+                        <div class="stage-name">未来のボスと向き合う</div>
+                    </div>
+                    <div class="path-line"></div>
+                </div>
+
+                <!-- ステージ7 (ダミーデータ) -->
+                <div class="stage-wrapper">
+                    <div class="stage-node locked" onclick="openModal(7)" aria-label="ステージ7: さらなる挑戦（未開放）">
+                        <div class="stage-number-badge">7</div>
+                        <div class="stage-icon-wrapper">
+                            <div class="stage-icon">🌟</div>
+                        </div>
+                        <div class="stage-name">さらなる挑戦</div>
+                    </div>
+                    <div class="path-line"></div>
+                </div>
+
+                <!-- ステージ8 (ダミーデータ) -->
+                <div class="stage-wrapper">
+                    <div class="stage-node locked" onclick="openModal(8)" aria-label="ステージ8: 伝説の地へ（未開放）">
+                        <div class="stage-number-badge">8</div>
+                        <div class="stage-icon-wrapper">
+                            <div class="stage-icon">🗺️</div>
+                        </div>
+                        <div class="stage-name">伝説の地へ</div>
+                    </div>
+                    <!-- 最後の要素なので path-line なし -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- クエスト開始ボタン -->
+    <button class="quest-start-btn" aria-label="クエストに挑戦する">
+        <span class="sword-icon">⚔️</span>
+        <span class="btn-text">クエストに挑む！</span>
+    </button>
+
+    <!-- ステージ詳細モーダル -->
+    <div class="stage-modal" id="stageModal" role="dialog" aria-modal="true" aria-labelledby="modalStageName">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()" aria-label="モーダルを閉じる">×</button>
+            <!-- ▼ 3. ステージポップアップ: モーダル内要素変更 -->
+            <h2 class="stage-title heading-secondary" id="modalStageName"></h2>
+            <p class="stage-modal-message" id="modalMessage"></p>
+            <div class="modal-actions">
+                <button class="modal-action-btn video-btn">🎬 動画を見る</button>
+                <button class="modal-action-btn quest-btn">⚔ クエストに挑む</button>
+            </div>
+            <!-- ▲ 3. ステージポップアップここまで -->
+        </div>
+    </div>
+
+    <script>
+        // ▼ 4. ステージ文言差し替え: ステージデータ更新
+        const stageData = {
+            1: {
+                name: "君はどんな冒険者？",
+                htmlDescription: "この世界の地図をひらいて、CLAFTを冒険しよう！", // HTMLのaria-label等で使用
+                modalMessage: "「この世界をどう歩くかは、自分で決めていい」"
+            },
+            2: {
+                name: "ワクもやエネルギー",
+                htmlDescription: "ワクワク・もやもやは問いの原動力になる",
+                modalMessage: "「君の感じた“もやもや”が、冒険の出発点」"
+            },
+            3: {
+                name: "君はどんなキャラ？",
+                htmlDescription: "自分を育てる育成ゲーム",
+                modalMessage: "「自分のスキルツリーを育てるのは、君自身だ」"
+            },
+            4: {
+                name: "どんな道具を持ってる？",
+                htmlDescription: "この世界の地図をひらいて、CLAFTを冒険しよう！", // テーブルではステージ1と同じ説明文
+                modalMessage: "「自分のスキルツリーを育てるのは、君自身だ」" // テーブルではステージ3と同じメッセージ
+            },
+            5: {
+                name: "仲間と冒険するって？",
+                htmlDescription: "この世界の地図をひらいて、CLAFTを冒険しよう！", // テーブルではステージ1と同じ説明文
+                modalMessage: "「自分のスキルツリーを育てるのは、君自身だ」" // テーブルではステージ3と同じメッセージ
+            },
+            6: {
+                name: "未来のボスと向き合う",
+                htmlDescription: "この世界の地図をひらいて、CLAFTを冒険しよう！", // テーブルではステージ1と同じ説明文
+                modalMessage: "「自分のスキルツリーを育てるのは、君自身だ」" // テーブルではステージ3と同じメッセージ
+            },
+            // ダミーデータ (7, 8)
+            7: {
+                name: "さらなる挑戦",
+                htmlDescription: "未知の領域へ足を踏み入れよう。",
+                modalMessage: "「新たな発見が君を待っている。」"
+            },
+            8: {
+                name: "伝説の地へ",
+                htmlDescription: "最後の試練が待ち受ける。",
+                modalMessage: "「君の物語はここから始まる。」"
+            }
+        };
+
+        const modal = document.getElementById('stageModal');
+        const modalStageName = document.getElementById('modalStageName');
+        const modalMessage = document.getElementById('modalMessage');
+
+        // モーダルを開く
+        function openModal(stageNum) {
+            const data = stageData[stageNum];
+            if (!data) return; // データがない場合は何もしない
+            
+            modalStageName.textContent = data.name;
+            modalMessage.textContent = data.modalMessage;
+            
+            modal.classList.add('active');
+            // モーダルが開かれたらフォーカスをモーダル自体（または最初のフォーカス可能要素）に移動
+            modal.focus(); 
+        }
+
+        // モーダルを閉じる
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // モーダルの外側をクリックしたら閉じる
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // ESCキーでモーダルを閉じる
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // ▼ 1. ハンバーガーメニュー制御
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mainNav = document.getElementById('mainNav');
+        const body = document.body;
+
+        hamburgerBtn.addEventListener('click', () => {
+            const isOpen = mainNav.classList.toggle('nav-open');
+            hamburgerBtn.setAttribute('aria-expanded', isOpen);
+            body.style.overflow = isOpen ? 'hidden' : ''; // メニュー展開時、bodyのスクロールを禁止 (SP向け)
+
+            // PCの場合、サイドパネル表示でbodyスクロールは許可した方が使いやすい場合もある
+            // if (window.innerWidth > 768 && isOpen) {
+            //    body.style.overflow = ''; 
+            // }
+        });
+        // ▲ 1. ハンバーガーメニュー制御ここまで
+
+    </script>
+</body>
+</html>
