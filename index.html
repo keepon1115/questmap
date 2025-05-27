@@ -30,11 +30,11 @@
         /* --- ▼ 背景演出 --- */
         .sky-object {
             position: fixed;
-            opacity: 0.8; /* 少し濃く */
+            opacity: 0.8;
             animation-timing-function: linear;
             animation-iteration-count: infinite;
             z-index: 1;
-            pointer-events: none; /* クリックイベントを透過 */
+            pointer-events: none;
         }
 
         .cloud {
@@ -46,26 +46,25 @@
                 20px 10px 0 10px white,
                 -20px 10px 0 5px white;
         }
-        .bird {
-            font-size: 30px; /* 鳥の絵文字サイズ */
-            /* width, height はfont-sizeに依存 */
-            animation-name: float-bird !important; /* 既存のfloat-sky-*を上書き */
-        }
-        .bird::before {
-            content: '🐦';
-        }
+        /* .bird クラスと float-bird アニメーションは削除 */
 
         .ufo {
             font-size: 40px;
             text-align: center;
+            /* UFOの揺れアニメーションを追加しても良い */
+            animation: ufo-wobble 3s ease-in-out infinite alternate;
         }
         .ufo::before {
             content: '🛸';
         }
+        @keyframes ufo-wobble {
+            from { transform: translateY(-3px) rotate(-2deg); }
+            to { transform: translateY(3px) rotate(2deg); }
+        }
         /* --- ▲ 背景演出 --- */
 
         @keyframes float-sky-ltr {
-            from { transform: translateX(0) translateY(var(--sy, 0)); } /* translateY追加 */
+            from { transform: translateX(0) translateY(var(--sy, 0)); }
             to { transform: translateX(calc(100vw + 200px)) translateY(var(--ey, 0)); }
         }
 
@@ -74,23 +73,13 @@
             to { transform: translateX(calc(-100vw - 200px)) translateY(var(--ey, 0)); }
         }
         
-        @keyframes float-bird { /* 鳥専用のアニメーション */
-            0% { transform: translateX(var(--sx, 0)) translateY(var(--sy, 0)) rotate(0deg); }
-            25% { transform: translateX(var(--sx-25, 25vw)) translateY(calc(var(--sy, 0) - 10px)) rotate(-5deg); } /* 少し上昇して傾く */
-            50% { transform: translateX(var(--sx-50, 50vw)) translateY(var(--sy, 0)) rotate(0deg); }
-            75% { transform: translateX(var(--sx-75, 75vw)) translateY(calc(var(--sy, 0) + 5px)) rotate(5deg); } /* 少し下降して傾く */
-            100% { transform: translateX(var(--ex, 100vw)) translateY(var(--ey, 0)) rotate(0deg); }
-        }
-        
-        /* ハンバーガーメニュー (変更なしのためコメントアウト) */
-        /* .hamburger { ... } */
+        /* ハンバーガーメニュー (変更なし) */
         .hamburger { position: fixed; top: 20px; left: 20px; z-index: 1100; width: 48px; height: 48px; background: #8B4513; border: 3px solid #654321; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; transition: transform 0.1s ease; box-shadow: 0 0 0 1px #A0522D, 3px 3px 0 0 rgba(0,0,0,0.3); }
         .hamburger:hover { transform: translate(-1px, -1px); box-shadow: 0 0 0 1px #A0522D, 4px 4px 0 0 rgba(0,0,0,0.3); }
         .hamburger:active { transform: translate(1px, 1px); box-shadow: 0 0 0 1px #A0522D, 2px 2px 0 0 rgba(0,0,0,0.3); }
         .hamburger span { width: 24px; height: 4px; background: #F5DEB3; border-radius: 0; transition: all 0.3s ease; }
 
-        /* サイドナビゲーション (変更なしのためコメントアウト) */
-        /* .side-nav { ... } */
+        /* サイドナビゲーション (変更なし) */
         .side-nav { position: fixed; top: 0; left: -100%; width: 100%; height: 100vh; background: #2C1810; border-right: 4px solid #654321; z-index: 1099; transition: left 0.3s ease; display: flex; flex-direction: column; padding: 80px 20px 20px; }
         @media (min-width: 768px) { .side-nav { width: 280px; } }
         .side-nav.active { left: 0; }
@@ -98,31 +87,26 @@
         .side-nav-item:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 0 rgba(0,0,0,0.5); background: #4D3827; }
         .side-nav-item:active { transform: translate(0, 0); box-shadow: 1px 1px 0 0 rgba(0,0,0,0.5); }
 
-        /* メインコンテナ (変更なしのためコメントアウト) */
-        /* .container { ... } */
+        /* メインコンテナ (変更なし) */
         .container { max-width: 1200px; margin: 0 auto; padding: 80px 16px 40px; position: relative; z-index: 10; }
 
-        /* ヘッダー (変更なしのためコメントアウト) */
-        /* .map-header { ... } */
+        /* ヘッダー (変更なし) */
         .map-header { text-align: center; margin-bottom: 30px; position: relative; }
         .map-header h1 { font-size: 2.5rem; color: #FFF; margin-bottom: 16px; text-shadow: 2px 2px 0 #4DB6F7, 4px 4px 0 #3A8BC4, 6px 6px 8px rgba(0,0,0,0.3); letter-spacing: 2px; animation: float_title 3s ease-in-out infinite; }
         @keyframes float_title { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         .map-header p { font-size: 1.1rem; color: #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); background: rgba(0,0,0,0.2); display: inline-block; padding: 4px 16px; border-radius: 0; border: 2px solid rgba(255,255,255,0.3); }
 
-        /* 冒険の記録ボタン (変更なしのためコメントアウト) */
-        /* .adventure-log-button { ... } */
+        /* 冒険の記録ボタン (変更なし) */
         .adventure-log-button { display: inline-block; margin: 20px auto 0; padding: 12px 32px; background: #FFD700; border: 3px solid #B8860B; color: #654321; font-weight: bold; font-size: 1rem; cursor: pointer; position: relative; box-shadow: 0 0 0 1px #DAA520, 4px 4px 0 0 rgba(0,0,0,0.3); transition: all 0.1s ease; }
         .adventure-log-button::before { content: '📖'; margin-right: 8px; }
         .adventure-log-button:hover { transform: translate(-2px, -2px); box-shadow: 0 0 0 1px #DAA520, 6px 6px 0 0 rgba(0,0,0,0.3); }
         .adventure-log-button:active { transform: translate(1px, 1px); box-shadow: 0 0 0 1px #DAA520, 2px 2px 0 0 rgba(0,0,0,0.3); }
 
-        /* ステージグリッド (変更なしのためコメントアウト) */
-        /* .stage-grid { ... } */
+        /* ステージグリッド (変更なし) */
         .stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-bottom: 40px; padding: 0 20px; }
         @media (max-width: 767px) { .stage-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; padding: 0; } }
 
-        /* ステージノード (変更なしのためコメントアウト) */
-        /* .stage-node { ... } */
+        /* ステージノード (変更なし) */
         .stage-node { position: relative; text-align: center; cursor: pointer; transition: transform 0.2s ease; }
         .stage-node:nth-child(2), .stage-node:nth-child(5) { transform: translateY(40px); }
         @media (max-width: 767px) { .stage-node:nth-child(even) { transform: translateY(40px); } .stage-node:nth-child(5) { transform: translateY(0); } }
@@ -130,7 +114,7 @@
         .stage-node:nth-child(2):hover, .stage-node:nth-child(5):hover { transform: translateY(35px) scale(1.05); }
         @media (max-width: 767px) { .stage-node:nth-child(even):hover { transform: translateY(35px) scale(1.05); } .stage-node:nth-child(5):hover { transform: translateY(-5px) scale(1.05); } }
         
-        /* ステージアイコン (アイコンカラー変化以外は変更なし) */
+        /* ステージアイコン (変更なし) */
         .stage-icon { width: 120px; height: 120px; margin: 0 auto 16px; position: relative; background: #E8F5E9; border: 4px solid #333; box-shadow: 0 0 0 2px #666, 6px 6px 0 0 rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 64px; transition: all 0.3s ease; overflow: hidden; }
         .stage-node.locked .stage-icon, .stage-node.current .stage-icon { background: #9E9E9E; }
         .stage-node.completed .stage-icon { background: #FFF9C4; box-shadow: 0 0 0 2px #FFD700, 6px 6px 0 0 rgba(0,0,0,0.3), 0 0 20px rgba(255,215,0,0.5); }
@@ -141,99 +125,78 @@
         .stage-node.completed .stage-icon .icon-fallback { filter: grayscale(0); }
         .stage-node.locked .stage-icon .icon-fallback { filter: grayscale(1); opacity: 0.7; }
 
-        /* クリア演出画像 (変更なしのためコメントアウト) */
-        /* .clear-effect { ... } */
+        /* クリア演出画像 (変更なし) */
         .clear-effect { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; object-fit: contain; display: none; z-index: 2; animation: effect-animation 2s ease-in-out infinite; }
         .stage-node.completed .clear-effect { display: block; }
         @keyframes effect-animation { 0%, 100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.9; } 25% { transform: translateY(-5px) scale(1.1) rotate(5deg); opacity: 1; } 50% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.9; } 75% { transform: translateY(-3px) scale(1.05) rotate(-5deg); opacity: 1; } }
         
-        /* CLEARバッジ (変更なしのためコメントアウト) */
-        /* .clear-badge { ... } */
+        /* CLEARバッジ (変更なし) */
         .clear-badge { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: #FFD700; border: 3px solid #B8860B; padding: 4px 12px; font-weight: bold; font-size: 14px; color: #654321; letter-spacing: 1px; box-shadow: 0 0 0 1px #DAA520, 3px 3px 0 0 rgba(0,0,0,0.5); z-index: 10; animation: bounce-in 0.5s ease; display: none; }
         .stage-node.completed .clear-badge { display: block; }
         @keyframes bounce-in { 0% { transform: translateX(-50%) translateY(-20px) scale(0); } 50% { transform: translateX(-50%) translateY(0) scale(1.2); } 100% { transform: translateX(-50%) translateY(0) scale(1); } }
 
-        /* --- ▼ ステージ番号バッジ（顔風デザイン） --- */
-        .stage-number-badge {
+        /* ステージ番号バッジ（顔風デザイン）(変更なし) */
+        .stage-number-badge { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; background: #4DB6F7; border: 3px solid #2C88C7; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; color: white; box-shadow: 0 0 0 1px #5AC8F7, 3px 3px 0 0 rgba(0,0,0,0.3); z-index: 5; padding: 2px; }
+        .stage-number-badge::before { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; position: absolute; top: 8px; left: 10px; box-shadow: 0 0 0 1px #2C88C7; }
+        .stage-number-badge::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; position: absolute; top: 8px; right: 10px; box-shadow: 0 0 0 1px #2C88C7; }
+        .stage-number-text { margin-top: 14px; }
+        .stage-node.locked .stage-number-badge { background: #757575; border-color: #616161; box-shadow: 0 0 0 1px #9E9E9E, 3px 3px 0 0 rgba(0,0,0,0.3); }
+        .stage-node.locked .stage-number-badge::before, .stage-node.locked .stage-number-badge::after { background: #ccc; box-shadow: 0 0 0 1px #616161; }
+        .stage-node.completed .stage-number-badge { background: #8EE38F; border-color: #6CBD6C; }
+        .stage-node.completed .stage-number-badge::before, .stage-node.completed .stage-number-badge::after { box-shadow: 0 0 0 1px #6CBD6C; }
+        
+        /* --- ▼ 現在地マーク変更: .hero-character -> .hero-face --- */
+        .hero-face { /* .hero-character からスタイルを移行 */
             position: absolute;
-            bottom: -15px; /* 少し上げる */
+            top: -30px; /* ステージアイコンの上に少し重なるように調整 */
             left: 50%;
             transform: translateX(-50%);
-            width: 44px; /* 少し大きく */
-            height: 44px;
-            background: #4DB6F7; /* 明るい青 */
-            border: 3px solid #2C88C7; /* 濃い青の枠 */
-            border-radius: 8px; /* 少し角丸 */
-            display: flex;
-            flex-direction: column; /* 番号と目を縦に並べる */
-            align-items: center;
-            justify-content: center;
-            font-size: 18px; /* 番号のフォントサイズ */
-            font-weight: bold;
-            color: white;
-            box-shadow: 
-                0 0 0 1px #5AC8F7,
-                3px 3px 0 0 rgba(0,0,0,0.3);
-            z-index: 5;
-            padding: 2px; /* 内側の余白 */
+            width: 40px; /* 顔のサイズ */
+            height: 40px;
+            background-color: #FFEB3B; /* 顔の色（黄色） */
+            border: 3px solid #FBC02D; /* 顔の枠線 */
+            border-radius: 50%; /* 丸い顔 */
+            z-index: 20;
+            display: none; /* JSでcurrent時に表示 */
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            /* アニメーションはシンプルに */
+            animation: hero-face-bounce 1.5s ease-in-out infinite;
         }
-        .stage-number-badge::before { /* 目（左） */
+        .hero-face::before, .hero-face::after { /* 目 */
             content: '';
-            width: 6px;
-            height: 6px;
-            background: white;
-            border-radius: 50%;
             position: absolute;
-            top: 8px;
-            left: 10px;
-            box-shadow: 0 0 0 1px #2C88C7; /* 目の縁取り */
-        }
-        .stage-number-badge::after { /* 目（右） */
-            content: '';
             width: 6px;
-            height: 6px;
-            background: white;
-            border-radius: 50%;
+            height: 8px;
+            background-color: #333;
+            border-radius: 3px / 4px; /* 楕円形 */
+            top: 12px;
+        }
+        .hero-face::before { left: 9px; } /* 左目 */
+        .hero-face::after { right: 9px; } /* 右目 */
+
+        /* 口 (CSSで描画するのは複雑なので、シンプルな線や省略も検討) */
+        .hero-face .mouth {
             position: absolute;
-            top: 8px;
-            right: 10px;
-            box-shadow: 0 0 0 1px #2C88C7;
+            width: 16px;
+            height: 2px;
+            background-color: #333;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 1px;
         }
-        .stage-number-text { /* 番号を下に配置 */
-            margin-top: 14px; /* 目との間隔 */
-        }
+        /* レベルによる変化は一旦省略 */
 
-        .stage-node.locked .stage-number-badge {
-            background: #757575;
-            border-color: #616161;
-            box-shadow: 
-                0 0 0 1px #9E9E9E,
-                3px 3px 0 0 rgba(0,0,0,0.3);
+        .stage-node.current .hero-face {
+            display: block;
         }
-        .stage-node.locked .stage-number-badge::before,
-        .stage-node.locked .stage-number-badge::after {
-            background: #ccc; /* ロック時は目の色も変える */
-            box-shadow: 0 0 0 1px #616161;
-        }
-         .stage-node.completed .stage-number-badge { /* クリア時 */
-            background: #8EE38F; /* 明るい緑 */
-            border-color: #6CBD6C;
-        }
-        .stage-node.completed .stage-number-badge::before,
-        .stage-node.completed .stage-number-badge::after {
-             box-shadow: 0 0 0 1px #6CBD6C;
-        }
-
-        /* --- ▲ ステージ番号バッジ --- */
         
-        /* 主人公キャラクター (変更なし) */
-        .hero-character { position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 48px; height: 48px; z-index: 20; animation: hero-idle 0.8s steps(2) infinite; display: none; }
-        .stage-node.current .hero-character { display: block; }
-        @keyframes hero-idle { 0% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-2px); } }
-        .hero-sprite { width: 100%; height: 100%; background-size: 48px 48px; image-rendering: pixelated; }
-        .hero-level-1 { background: linear-gradient(to right, transparent 45%, #8B4513 45%, #8B4513 55%, transparent 55%), linear-gradient(to bottom, #F4A460 0%, #F4A460 30%, #4169E1 30%, #4169E1 70%, #8B4513 70%); }
-        .hero-level-2 { background: linear-gradient(to bottom, #FF0000 0%, #FF0000 15%, transparent 15%), linear-gradient(to right, transparent 45%, #8B4513 45%, #8B4513 55%, transparent 55%), linear-gradient(to bottom, #F4A460 15%, #F4A460 35%, #4169E1 35%, #4169E1 70%, #8B4513 70%); }
-        .hero-level-3 { background: linear-gradient(to right, transparent 70%, #C0C0C0 70%, #C0C0C0 75%, transparent 75%), linear-gradient(to bottom, #FF0000 0%, #FF0000 15%, transparent 15%), linear-gradient(to right, transparent 45%, #8B4513 45%, #8B4513 55%, transparent 55%), linear-gradient(to bottom, #F4A460 15%, #F4A460 35%, #32CD32 35%, #32CD32 70%, #8B4513 70%); }
+        @keyframes hero-face-bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-4px); }
+        }
+        /* .hero-sprite と hero-level-* は削除 */
+        /* --- ▲ 現在地マーク変更 --- */
         
         /* ステージ情報 (変更なし) */
         .stage-info { background: white; border: 3px solid #333; padding: 12px 16px; margin-top: 16px; position: relative; box-shadow: 0 0 0 1px #666, 4px 4px 0 0 rgba(0,0,0,0.2); }
@@ -245,7 +208,7 @@
         .stage-node:nth-child(3n) .path-line, .stage-node:last-child .path-line { display: none; }
         @media (max-width: 767px) { .stage-node:nth-child(3n) .path-line { display: block; } .stage-node:nth-child(2n) .path-line, .stage-node:last-child .path-line { display: none; } }
         
-        /* クエストボタン (位置固定以外は変更なし) */
+        /* クエストボタン (変更なし) */
         .quest-button { position: fixed; bottom: 30px; right: 30px; width: auto; min-width: 200px; margin: 0; padding: 16px 32px; background: #FF6B6B; border: 4px solid #DC143C; color: white; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 0 0 2px #FF8787, 6px 6px 0 0 rgba(0,0,0,0.3); transition: all 0.1s ease; animation: pulse_button 2s ease-in-out infinite; z-index: 900; }
         @keyframes pulse_button { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
         .quest-button:hover { transform: translate(-2px, -2px) scale(1.02); box-shadow: 0 0 0 2px #FF8787, 8px 8px 0 0 rgba(0,0,0,0.3); animation: none; }
@@ -291,7 +254,8 @@
             <!-- ステージ1 -->
             <div class="stage-node" id="stage-1" data-stage-id="1">
                 <div class="clear-badge">CLEAR!</div>
-                <div class="hero-character"><div class="hero-sprite hero-level-1"></div></div>
+                <!-- ▼ 現在地マーク変更 -->
+                <div class="hero-face"><div class="mouth"></div></div> 
                 <div class="stage-icon">
                     <img class="icon-image" src="" alt="ステージ1アイコン" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span class="icon-fallback">🏠</span>
@@ -304,7 +268,7 @@
             <!-- ステージ2 -->
             <div class="stage-node" id="stage-2" data-stage-id="2">
                 <div class="clear-badge">CLEAR!</div>
-                <div class="hero-character"><div class="hero-sprite hero-level-1"></div></div>
+                <div class="hero-face"><div class="mouth"></div></div>
                 <div class="stage-icon">
                     <img class="icon-image" src="" alt="ステージ2アイコン" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span class="icon-fallback">🌲</span>
@@ -317,7 +281,7 @@
             <!-- ステージ3 -->
             <div class="stage-node" id="stage-3" data-stage-id="3">
                 <div class="clear-badge">CLEAR!</div>
-                <div class="hero-character"><div class="hero-sprite hero-level-1"></div></div>
+                <div class="hero-face"><div class="mouth"></div></div>
                 <div class="stage-icon">
                     <img class="icon-image" src="" alt="ステージ3アイコン" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span class="icon-fallback">⚔️</span>
@@ -329,7 +293,7 @@
             <!-- ステージ4 -->
             <div class="stage-node" id="stage-4" data-stage-id="4">
                 <div class="clear-badge">CLEAR!</div>
-                <div class="hero-character"><div class="hero-sprite hero-level-1"></div></div>
+                <div class="hero-face"><div class="mouth"></div></div>
                 <div class="stage-icon">
                     <img class="icon-image" src="" alt="ステージ4アイコン" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span class="icon-fallback">🛡️</span>
@@ -341,7 +305,7 @@
             <!-- ステージ5 -->
             <div class="stage-node" id="stage-5" data-stage-id="5">
                 <div class="clear-badge">CLEAR!</div>
-                <div class="hero-character"><div class="hero-sprite hero-level-1"></div></div>
+                <div class="hero-face"><div class="mouth"></div></div>
                 <div class="stage-icon">
                     <img class="icon-image" src="" alt="ステージ5アイコン" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span class="icon-fallback">👥</span>
@@ -353,7 +317,7 @@
             <!-- ステージ6 -->
             <div class="stage-node" id="stage-6" data-stage-id="6">
                 <div class="clear-badge">CLEAR!</div>
-                <div class="hero-character"><div class="hero-sprite hero-level-1"></div></div>
+                <div class="hero-face"><div class="mouth"></div></div>
                 <div class="stage-icon">
                     <img class="icon-image" src="" alt="ステージ6アイコン" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span class="icon-fallback">🏰</span>
@@ -367,21 +331,14 @@
     <div class="modal" id="stageModal"> <div class="modal-content"> <button class="modal-close" id="modalCloseBtn">×</button> <h2 class="modal-title" id="modalStageTitle"></h2> <p class="modal-description" id="modalStageDescription"></p> <div class="modal-message" id="modalStageMessage"></div> <div class="modal-buttons"> <button class="modal-button video" id="modalVideoBtn">🎬 動画を見る</button> <button class="modal-button quest" id="modalQuestBtn">⚔️ クエストに挑む</button> </div> </div> </div>
     
     <script>
-        // グローバル設定 (変更なし)
+        // グローバル設定
         const ADALO_API_ENDPOINT = 'YOUR_ADALO_ENDPOINT/collections/YOUR_PROGRESS_COLLECTION_ID';
         const ADALO_API_KEY = 'Bearer YOUR_ADALO_API_KEY';
         const TOTAL_STAGES = 6;
-        const NUM_SKY_OBJECTS = 8; // 少し増やす
+        const NUM_SKY_OBJECTS = 7; // 少し調整
 
-        // ステージ静的情報 (画像URLを空にしてJSで設定するように変更)
-        const stageStaticData = {
-            1: { title: '君はどんな冒険者？', description: 'この世界の地図をひらいて、CLAFTを冒険しよう！', message: '「この世界をどう歩くかは、自分で決めていい」', iconImage: 'https://via.placeholder.com/64x64/8B4513/FFFFFF?text=House', fallbackIcon: '🏠', clearEffectImage: 'https://via.placeholder.com/32x32/CCCCCC/000000?text=Smoke' },
-            2: { title: 'ワクもやエネルギー', description: 'ワクワク・もやもやは問いの原動力になる', message: '「君の感じた"もやもや"が、冒険の出発点」', iconImage: 'https://via.placeholder.com/64x64/228B22/FFFFFF?text=Forest', fallbackIcon: '🌲', clearEffectImage: 'https://via.placeholder.com/32x32/8B4513/FFFFFF?text=Animal' },
-            3: { title: '君はどんなキャラ？', description: '自分を育てる育成ゲーム', message: '「自分のスキルツリーを育てるのは、君自身だ」', iconImage: 'https://via.placeholder.com/64x64/4169E1/FFFFFF?text=Sword', fallbackIcon: '⚔️', clearEffectImage: null },
-            4: { title: 'どんな道具を持ってる？', description: 'この世界の地図をひらいて、CLAFTを冒険しよう！', message: '「自分のスキルツリーを育てるのは、君自身だ」', iconImage: 'https://via.placeholder.com/64x64/FFD700/000000?text=Shield', fallbackIcon: '🛡️', clearEffectImage: null },
-            5: { title: '仲間と冒険するって？', description: 'この世界の地図をひらいて、CLAFTを冒険しよう！', message: '「自分のスキルツリーを育てるのは、君自身だ」', iconImage: 'https://via.placeholder.com/64x64/32CD32/FFFFFF?text=Team', fallbackIcon: '👥', clearEffectImage: null },
-            6: { title: '未来のボスと向き合う', description: 'この世界の地図をひらいて、CLAFTを冒険しよう！', message: '「自分のスキルツリーを育てるのは、君自身だ」', iconImage: 'https://via.placeholder.com/64x64/8B0000/FFFFFF?text=Boss', fallbackIcon: '🏰', clearEffectImage: null }
-        };
+        // ステージ静的情報 (変更なし)
+        const stageStaticData = { 1: { title: '君はどんな冒険者？', description: 'この世界の地図をひらいて、CLAFTを冒険しよう！', message: '「この世界をどう歩くかは、自分で決めていい」', iconImage: 'https://via.placeholder.com/64x64/8B4513/FFFFFF?text=House', fallbackIcon: '🏠', clearEffectImage: 'https://via.placeholder.com/32x32/CCCCCC/000000?text=Smoke' }, 2: { title: 'ワクもやエネルギー', description: 'ワクワク・もやもやは問いの原動力になる', message: '「君の感じた"もやもや"が、冒険の出発点」', iconImage: 'https://via.placeholder.com/64x64/228B22/FFFFFF?text=Forest', fallbackIcon: '🌲', clearEffectImage: 'https://via.placeholder.com/32x32/8B4513/FFFFFF?text=Animal' }, 3: { title: '君はどんなキャラ？', description: '自分を育てる育成ゲーム', message: '「自分のスキルツリーを育てるのは、君自身だ」', iconImage: 'https://via.placeholder.com/64x64/4169E1/FFFFFF?text=Sword', fallbackIcon: '⚔️', clearEffectImage: null }, 4: { title: 'どんな道具を持ってる？', description: 'この世界の地図をひらいて、CLAFTを冒険しよう！', message: '「自分のスキルツリーを育てるのは、君自身だ」', iconImage: 'https://via.placeholder.com/64x64/FFD700/000000?text=Shield', fallbackIcon: '🛡️', clearEffectImage: null }, 5: { title: '仲間と冒険するって？', description: 'この世界の地図をひらいて、CLAFTを冒険しよう！', message: '「自分のスキルツリーを育てるのは、君自身だ」', iconImage: 'https://via.placeholder.com/64x64/32CD32/FFFFFF?text=Team', fallbackIcon: '👥', clearEffectImage: null }, 6: { title: '未来のボスと向き合う', description: 'この世界の地図をひらいて、CLAFTを冒険しよう！', message: '「自分のスキルツリーを育てるのは、君自身だ」', iconImage: 'https://via.placeholder.com/64x64/8B0000/FFFFFF?text=Boss', fallbackIcon: '🏰', clearEffectImage: null } };
         // DOM要素 (変更なし)
         const loadingOverlay = document.getElementById('loadingOverlay');
         const stageGrid = document.getElementById('stageGrid');
@@ -397,107 +354,105 @@
         
         let currentUserId = null;
         let userProgress = {}; 
-        let heroLevel = 1;
+        // let heroLevel = 1; // hero-face に変更したため、レベル管理は一旦不要に
         let currentStageIdForModal = null;
 
         // --- ▼ 背景オブジェクト生成 修正 ---
         function createSkyObjects() {
-            skyObjectsContainer.innerHTML = ''; // 既存のオブジェクトをクリア
+            skyObjectsContainer.innerHTML = ''; 
             for (let i = 0; i < NUM_SKY_OBJECTS; i++) {
                 const obj = document.createElement('div');
                 obj.classList.add('sky-object');
                 
                 let type;
                 const randomValue = Math.random();
-                if (randomValue < 0.6) { // 60% 雲
+                if (randomValue < 0.95) { // 95% 雲
                     type = 'cloud';
-                } else if (randomValue < 0.9) { // 30% 鳥
-                    type = 'bird';
-                } else { // 10% UFO
+                } else { // 5% UFO
                     type = 'ufo';
                 }
                 obj.classList.add(type);
 
-                obj.style.top = `${Math.random() * 70 + 5}%`; // 5%から75%の高さ
-                const duration = Math.random() * 25 + 15; // 15秒から40秒
+                obj.style.top = `${Math.random() * 70 + 5}%`; 
+                const duration = Math.random() * 25 + 20; // 20秒から45秒
                 obj.style.animationDuration = `${duration}s`;
                 
-                // CSS変数でアニメーションの開始/終了Y座標と途中のX座標を渡す
-                const startY = Math.random() * 10 - 5; // -5px から +5px の揺らぎ
+                const startY = Math.random() * 10 - 5; 
                 const endY = Math.random() * 10 - 5;
                 obj.style.setProperty('--sy', `${startY}px`);
                 obj.style.setProperty('--ey', `${endY}px`);
 
-
-                if (type === 'bird') {
-                    obj.style.animationName = 'float-bird'; // 鳥専用アニメーション
-                    // 鳥のアニメーション用に途中のX座標も設定
-                    if (Math.random() < 0.5) { // 左から右
-                        obj.style.left = `-${Math.random() * 50 + 50}px`;
-                        obj.style.setProperty('--sx', `0px`);
-                        obj.style.setProperty('--sx-25', `${window.innerWidth * 0.25 + Math.random()*50-25}px`);
-                        obj.style.setProperty('--sx-50', `${window.innerWidth * 0.5 + Math.random()*50-25}px`);
-                        obj.style.setProperty('--sx-75', `${window.innerWidth * 0.75 + Math.random()*50-25}px`);
-                        obj.style.setProperty('--ex', `${window.innerWidth + 100}px`);
-                    } else { // 右から左
-                        obj.style.right = `-${Math.random() * 50 + 50}px`;
-                        obj.style.setProperty('--sx', `0px`); // translateXの開始は常に0
-                        obj.style.setProperty('--sx-25', `${-window.innerWidth * 0.25 + Math.random()*50-25}px`);
-                        obj.style.setProperty('--sx-50', `${-window.innerWidth * 0.5 + Math.random()*50-25}px`);
-                        obj.style.setProperty('--sx-75', `${-window.innerWidth * 0.75 + Math.random()*50-25}px`);
-                        obj.style.setProperty('--ex', `${-window.innerWidth - 100}px`);
-                        obj.style.transform = 'scaleX(-1)'; // 右向きの鳥を反転
-                    }
-                } else { // 雲とUFO
-                    if (Math.random() < 0.5) {
-                        obj.style.left = `-${Math.random() * 100 + 100}px`;
-                        obj.style.animationName = 'float-sky-ltr';
-                    } else {
-                        obj.style.right = `-${Math.random() * 100 + 100}px`;
-                        obj.style.animationName = 'float-sky-rtl';
-                    }
+                // 雲とUFOは共通の横移動アニメーション
+                if (Math.random() < 0.5) {
+                    obj.style.left = `-${Math.random() * 100 + 100}px`;
+                    obj.style.animationName = 'float-sky-ltr';
+                } else {
+                    obj.style.right = `-${Math.random() * 100 + 100}px`;
+                    obj.style.animationName = 'float-sky-rtl';
                 }
-                obj.style.animationDelay = `${Math.random() * duration * 0.5}s`; // 開始タイミングのばらつきを大きく
+                obj.style.animationDelay = `${Math.random() * duration * 0.8}s`; // 遅延のばらつきを少し抑える
 
                 skyObjectsContainer.appendChild(obj);
             }
         }
         // --- ▲ 背景オブジェクト生成 ---
 
-        // (ローディング表示、ユーザーID取得、Adalo API連携、主人公レベル更新 は変更なし)
+        // ローディング表示、ユーザーID取得、Adalo API連携 (変更なし)
         function showLoading(show) { loadingOverlay.style.display = show ? 'flex' : 'none'; }
         function getUserIdFromUrl() { const params = new URLSearchParams(window.location.search); return params.get('userId'); }
         async function fetchUserProgress(userId) { /* ...前回同様... */  showLoading(true); console.log(`Fetching progress for userId: ${userId}`); return new Promise(resolve => { setTimeout(() => { const dummyApiResponse = []; const progress = {}; if (dummyApiResponse.length === 0 && userId !== 'testUserAllClear') { progress[1] = 'current'; for (let i = 2; i <= TOTAL_STAGES; i++) { progress[i] = 'locked'; } } else if (userId === 'testUserAllClear') { for (let i = 1; i <= TOTAL_STAGES; i++) { progress[i] = 'completed'; } } else { for (let i = 1; i <= TOTAL_STAGES; i++) { const record = dummyApiResponse.find(r => r.stageId === i); progress[i] = record ? record.status : (i === 1 ? 'current' : 'locked'); } } console.log('Dummy progress fetched:', progress); showLoading(false); resolve(progress); }, 1000); }); }
         async function saveUserProgress(userId, stageId, newStatus) { /* ...前回同様... */ showLoading(true); console.log(`Saving progress for userId: ${userId}, stageId: ${stageId}, status: ${newStatus}`); return new Promise(resolve => { setTimeout(() => { userProgress[stageId] = newStatus; console.log('Dummy progress saved:', userProgress); showLoading(false); resolve(true); }, 500); }); }
-        function updateHeroLevel() { /* ...前回同様... */ const completedCount = Object.values(userProgress).filter(status => status === 'completed').length; if (completedCount >= 4) heroLevel = 3; else if (completedCount >= 2) heroLevel = 2; else heroLevel = 1; }
+        
+        // updateHeroLevel 関数は hero-face に変更したため不要 or 別途顔の見た目変更ロジックとして再定義
 
-        // --- 画面表示更新 (変更なし) ---
-        function updateStageDisplay() { /* ...前回同様... */ 
-            updateHeroLevel(); let currentStageExists = false; let allStagesCompleted = true;
+        // --- 画面表示更新 ---
+        function updateStageDisplay() {
+            // updateHeroLevel(); // hero-face に変更したため、呼び出しを一旦コメントアウト
+            let currentStageExists = false;
+            let allStagesCompleted = true; 
+
             for (let i = 1; i <= TOTAL_STAGES; i++) {
-                const stageNode = document.getElementById(`stage-${i}`); if (!stageNode) continue;
+                const stageNode = document.getElementById(`stage-${i}`);
+                if (!stageNode) continue;
+
                 const status = userProgress[i] || 'locked';
-                stageNode.classList.remove('completed', 'current', 'locked'); stageNode.classList.add(status);
-                if (status !== 'completed') { allStagesCompleted = false; }
+                stageNode.classList.remove('completed', 'current', 'locked');
+                stageNode.classList.add(status);
+                
+                if (status !== 'completed') {
+                    allStagesCompleted = false;
+                }
+                
                 const staticInfo = stageStaticData[i];
                 stageNode.querySelector('.stage-title').textContent = staticInfo.title;
                 stageNode.querySelector('.stage-description').textContent = staticInfo.description;
                 const iconImg = stageNode.querySelector('.stage-icon img.icon-image');
                 const fallbackSpan = stageNode.querySelector('.stage-icon .icon-fallback');
-                if (iconImg) { iconImg.src = staticInfo.iconImage; iconImg.style.display = 'block'; fallbackSpan.style.display = 'none'; fallbackSpan.textContent = staticInfo.fallbackIcon; } // fallbackIconも設定
+                if (iconImg) { iconImg.src = staticInfo.iconImage; iconImg.style.display = 'block'; fallbackSpan.style.display = 'none'; fallbackSpan.textContent = staticInfo.fallbackIcon; }
                 const clearEffectImg = stageNode.querySelector('.clear-effect');
                 if (clearEffectImg) { if (status === 'completed' && staticInfo.clearEffectImage) { clearEffectImg.src = staticInfo.clearEffectImage; clearEffectImg.style.display = 'block'; } else { clearEffectImg.style.display = 'none'; } }
-                const heroCharacter = stageNode.querySelector('.hero-character');
-                if (heroCharacter) { if (status === 'current') { heroCharacter.style.display = 'block'; heroCharacter.querySelector('.hero-sprite').className = `hero-sprite hero-level-${heroLevel}`; currentStageExists = true; } else { heroCharacter.style.display = 'none'; } }
+                
+                // ▼ hero-face の表示制御
+                const heroFace = stageNode.querySelector('.hero-face'); 
+                if (heroFace) {
+                    if (status === 'current') {
+                        heroFace.style.display = 'block';
+                        // 顔の見た目をレベルで変える場合はここにロジックを追加
+                        currentStageExists = true;
+                    } else {
+                        heroFace.style.display = 'none';
+                    }
+                }
             }
+            
             if (allStagesCompleted) { mainQuestButton.textContent = '🎉 全ての冒険を達成！'; mainQuestButton.disabled = true; } 
             else if (!currentStageExists) { mainQuestButton.textContent = '❓ 現在地不明'; mainQuestButton.disabled = true; } 
             else { mainQuestButton.textContent = '🔥 次の冒険へ進む！'; mainQuestButton.disabled = false; }
         }
 
         // モーダル処理 (変更なし)
-        function openStageModal(stageId) { /* ...前回同様... */ const status = userProgress[stageId]; if (status === 'locked') { alert('このステージはまだ開放されていません！'); return; } currentStageIdForModal = stageId; const staticInfo = stageStaticData[stageId]; modalStageTitle.textContent = `ステージ ${stageId}: ${staticInfo.title}`; modalStageDescription.textContent = staticInfo.description; modalStageMessage.textContent = staticInfo.message; modalQuestBtn.style.display = (status === 'current') ? 'block' : 'none'; stageModal.style.display = 'flex'; }
-        function closeStageModal() { /* ...前回同様... */ stageModal.style.display = 'none'; currentStageIdForModal = null; }
+        function openStageModal(stageId) { const status = userProgress[stageId]; if (status === 'locked') { alert('このステージはまだ開放されていません！'); return; } currentStageIdForModal = stageId; const staticInfo = stageStaticData[stageId]; modalStageTitle.textContent = `ステージ ${stageId}: ${staticInfo.title}`; modalStageDescription.textContent = staticInfo.description; modalStageMessage.textContent = staticInfo.message; modalQuestBtn.style.display = (status === 'current') ? 'block' : 'none'; stageModal.style.display = 'flex'; }
+        function closeStageModal() { stageModal.style.display = 'none'; currentStageIdForModal = null; }
         
         // イベントリスナー (変更なし)
         const hamburger = document.getElementById('hamburger'); const sideNav = document.getElementById('sideNav');
@@ -507,9 +462,9 @@
         modalCloseBtn.addEventListener('click', closeStageModal);
         stageModal.addEventListener('click', (e) => { if (e.target === stageModal) closeStageModal(); });
         modalVideoBtn.addEventListener('click', () => { alert(`ステージ ${currentStageIdForModal} の動画コンテンツを表示します。（実装は別途）`); });
-        modalQuestBtn.addEventListener('click', async () => { /* ...前回同様... */ if (!currentStageIdForModal || userProgress[currentStageIdForModal] !== 'current') return; const success = await saveUserProgress(currentUserId, currentStageIdForModal, 'completed'); if (success) { userProgress[currentStageIdForModal] = 'completed'; const nextStageId = currentStageIdForModal + 1; if (nextStageId <= TOTAL_STAGES) { const nextSuccess = await saveUserProgress(currentUserId, nextStageId, 'current'); if (nextSuccess) { userProgress[nextStageId] = 'current'; } else { alert('次のステージの解放に失敗しました。'); } } updateStageDisplay(); closeStageModal(); setTimeout(() => { alert(`ステージ ${currentStageIdForModal} クリア！🎉 ${nextStageId <= TOTAL_STAGES && userProgress[nextStageId] === 'current' ? '次の冒険へ進もう！' : '全ての冒険を達成しました！'}`); }, 100); } else { alert('進捗の保存に失敗しました。'); } });
-        mainQuestButton.addEventListener('click', () => { /* ...前回同様... */ const currentStageEntry = Object.entries(userProgress).find(([_, status]) => status === 'current'); if (currentStageEntry) { openStageModal(parseInt(currentStageEntry[0])); } else if (Object.values(userProgress).every(s => s === 'completed')) { /* no-op */ } else { alert('冒険を始める準備ができていません。ページをリロードしてください。'); } });
-        document.getElementById('adventureLogBtn').addEventListener('click', () => { /* ...前回同様... */ let logText = "📖 これまでの冒険の記録\n\n"; let completedCount = 0; for (let i = 1; i <= TOTAL_STAGES; i++) { if (userProgress[i] === 'completed') { logText += `ステージ${i}: ${stageStaticData[i].title} - クリア済み\n`; completedCount++; } else if (userProgress[i] === 'current') { logText += `ステージ${i}: ${stageStaticData[i].title} - 挑戦中\n`; } } if (completedCount === 0 && !Object.values(userProgress).some(s => s === 'current')) { logText += 'まだ冒険は始まったばかりです！'; } logText += `\n主人公レベル: ${heroLevel}`; alert(logText); });
+        modalQuestBtn.addEventListener('click', async () => { if (!currentStageIdForModal || userProgress[currentStageIdForModal] !== 'current') return; const success = await saveUserProgress(currentUserId, currentStageIdForModal, 'completed'); if (success) { userProgress[currentStageIdForModal] = 'completed'; const nextStageId = currentStageIdForModal + 1; if (nextStageId <= TOTAL_STAGES) { const nextSuccess = await saveUserProgress(currentUserId, nextStageId, 'current'); if (nextSuccess) { userProgress[nextStageId] = 'current'; } else { alert('次のステージの解放に失敗しました。'); } } updateStageDisplay(); closeStageModal(); setTimeout(() => { alert(`ステージ ${currentStageIdForModal} クリア！🎉 ${nextStageId <= TOTAL_STAGES && userProgress[nextStageId] === 'current' ? '次の冒険へ進もう！' : '全ての冒険を達成しました！'}`); }, 100); } else { alert('進捗の保存に失敗しました。'); } });
+        mainQuestButton.addEventListener('click', () => { const currentStageEntry = Object.entries(userProgress).find(([_, status]) => status === 'current'); if (currentStageEntry) { openStageModal(parseInt(currentStageEntry[0])); } else if (Object.values(userProgress).every(s => s === 'completed')) { /* no-op */ } else { alert('冒険を始める準備ができていません。ページをリロードしてください。'); } });
+        document.getElementById('adventureLogBtn').addEventListener('click', () => { let logText = "📖 これまでの冒険の記録\n\n"; let completedCount = 0; for (let i = 1; i <= TOTAL_STAGES; i++) { if (userProgress[i] === 'completed') { logText += `ステージ${i}: ${stageStaticData[i].title} - クリア済み\n`; completedCount++; } else if (userProgress[i] === 'current') { logText += `ステージ${i}: ${stageStaticData[i].title} - 挑戦中\n`; } } if (completedCount === 0 && !Object.values(userProgress).some(s => s === 'current')) { logText += 'まだ冒険は始まったばかりです！'; } /* heroLevel の表示は削除 */ alert(logText); });
 
         // 初期化処理 (変更なし)
         async function initializeApp() { createSkyObjects(); currentUserId = getUserIdFromUrl(); if (!currentUserId) { currentUserId = 'testUser001'; console.warn('User ID not found, using default testUser001'); } userProgress = await fetchUserProgress(currentUserId); updateStageDisplay(); }
