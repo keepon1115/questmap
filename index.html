@@ -331,7 +331,7 @@
     <div class="modal" id="stageModal"> <div class="modal-content"> <button class="modal-close" id="modalCloseBtn">×</button> <h2 class="modal-title" id="modalStageTitle"></h2> <p class="modal-description" id="modalStageDescription"></p> <div class="modal-message" id="modalStageMessage"></div> <div class="modal-buttons"> <button class="modal-button video" id="modalVideoBtn">🎬 動画を見る</button> <button class="modal-button quest" id="modalQuestBtn">⚔️ クエストに挑む</button> </div> </div> </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 　　<script>
-    const SUPABASE_PROJECT_URL = https://laqvpxecqvlufboquffe.supabase.co';
+    const SUPABASE_PROJECT_URL = 'https://laqvpxecqvlufboquffe.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcXZweGVjcXZsdWZib3F1ZmZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MzYwNjgsImV4cCI6MjA2NDAxMjA2OH0.IRkg1miEpOGIFQMnno_P0hsMe1IgwCi2kl_kNcrmZTw';
 
     let supabase; // この変数を後で使います
@@ -340,14 +340,27 @@
         console.error("Supabase URLとAnon Keyが設定されていません。");
         alert("アプリの設定エラーです。管理者にお問い合わせください。");
     } else {
-        try {
-            // Supabaseクライアントを作成（これでSupabaseと通信できるようになる）
-            supabase = supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+                try {
+            // Supabaseクライアントを作成
+            // ▼ 修正 ▼
+            supabase = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+            // または、より一般的なのはライブラリがグローバルに supabase.createClient を提供する場合
+            // supabase = supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+            // しかし、CDNから読み込んだ場合、通常は supabase というグローバルオブジェクトが作成され、
+            // そのメソッドとして createClient があります。
+            // より安全なのは、ライブラリが提供するオブジェクト名を明示することです。
+            // ただし、Supabase V2 の公式ドキュメントでは以下のように案内されています。
+            // const { createClient } = supabase
+            // const client = createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY)
+            // 今回のケースでは、グローバルな supabase をそのまま使う場合、以下のようになります。
+            // ▼ より正確な修正 ▼
+            const { createClient } = window.supabase; // supabaseライブラリからcreateClient関数を分割代入
+            supabase = createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY); // グローバル変数のsupabaseに代入
+            // ▲ より正確な修正 ▲
+
             console.log('Supabaseクライアントの初期化に成功しました！');
         } catch (error) {
-            console.error('Supabaseクライアントの初期化中にエラーが発生しました:', error);
-            alert('アプリの起動に失敗しました。ページをリロードしてみてください。');
-        }
+            // ... (以下略)
     }
 </script>
     <script>
