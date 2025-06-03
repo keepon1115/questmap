@@ -8,12 +8,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CLAFT Quest">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png"> <!-- アイコンパスは適宜調整 -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link rel="manifest" href="manifest.json">
     <title>CLAFT クエストマップ - 冒険の書</title>
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ベーススタイル */
+        /* CSSは前回と変更なしのため、ここでは省略します */
+        /* (実際のファイルでは、前回のCSSがここにそのまま入ります) */
         * { margin: 0; padding: 0; box-sizing: border-box; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
         body { font-family: 'DotGothic16', 'M PLUS Rounded 1c', sans-serif; line-height: 1.6; color: #2c2c2c; overflow-x: hidden; background: linear-gradient(to bottom, #87CEEB 0%, #98D8E8 50%, #B0E0E6 100%); min-height: 100vh; position: relative; padding-bottom: 100px; }
         .sky-object { position: fixed; opacity: 0.8; animation-timing-function: linear; animation-iteration-count: infinite; z-index: 1; pointer-events: none; }
@@ -201,27 +202,20 @@
     <button class="quest-button" id="mainQuestButton">🔥 次の冒険へ進む！</button>
     <div class="modal" id="stageModal"> <div class="modal-content"> <button class="modal-close" id="modalCloseBtn">×</button> <h2 class="modal-title" id="modalStageTitle"></h2> <p class="modal-description" id="modalStageDescription"></p> <div class="modal-message" id="modalStageMessage"></div> <div class="modal-buttons"> <button class="modal-button video" id="modalVideoBtn">🎬 動画を見る</button> <button class="modal-button quest" id="modalQuestBtn">⚔️ クエストに挑む</button> </div> </div> </div>
     
-    <!-- ▼ Supabaseクライアントライブラリの読み込み ▼ -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
-    <!-- ▲ Supabaseクライアントライブラリの読み込み ▲ -->
-
-    <!-- ▼ Supabaseクライアントの初期化 ▼ -->
     <script>
-        const SUPABASE_PROJECT_URL = 'https://laqvpxecqvlufboquffe.supabase.co'; // セミコロン追加
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcXZweGVjcXZsdWZib3F1ZmZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MzYwNjgsImV4cCI6MjA2NDAxMjA2OH0.IRkg1miEpOGIFQMnno_P0hsMe1IgwCi2kl_kNcrmZTw'; // セミコロン追加
+        const SUPABASE_PROJECT_URL = 'https://laqvpxecqvlufboquffe.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcXZweGVjcXZsdWZib3F1ZmZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MzYwNjgsImV4cCI6MjA2NDAxMjA2OH0.IRkg1miEpOGIFQMnno_P0hsMe1IgwCi2kl_kNcrmZTw';
     
-        let supabaseClient; // 変数名を supabaseClientInstance や supabaseClient など明確なものに変更 (推奨)
+        let supabaseClient; 
     
         if (!SUPABASE_PROJECT_URL || !SUPABASE_ANON_KEY) {
             console.error("Supabase URLとAnon Keyが設定されていません。");
             alert("アプリの設定エラーです。管理者にお問い合わせください。");
         } else {
             try {
-                // Supabaseライブラリはグローバルに 'supabase' というオブジェクトをエクスポートします
-                // その中の createClient 関数を使います
-                const { createClient } = window.supabase; // もし window.supabase が未定義なら、単に supabase
+                const { createClient } = supabase; 
                 supabaseClient = createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY); 
-    
                 console.log('Supabaseクライアントの初期化に成功しました！');
             } catch (error) {
                 console.error('Supabaseクライアントの初期化中にエラーが発生しました:', error);
@@ -229,17 +223,10 @@
             }
         }
     </script>
-    <!-- ▲ Supabaseクライアントの初期化 ▲ -->
-
     <script>
-        // グローバル設定
-        // ADALO関連の定数は不要なので削除
-        // const ADALO_API_ENDPOINT = 'YOUR_ADALO_ENDPOINT/collections/YOUR_PROGRESS_COLLECTION_ID';
-        // const ADALO_API_KEY = 'Bearer YOUR_ADALO_API_KEY';
         const TOTAL_STAGES = 6;
         const NUM_SKY_OBJECTS = 7; 
 
-        // ステージ静的情報 (画像URLを正しいプレースホルダーに修正)
         const stageStaticData = {
             1: { title: '君はどんな冒険者？', description: 'この世界の地図をひらいて、CLAFTを冒険しよう！', message: '「この世界をどう歩くかは、自分で決めていい」', iconImage: 'https://via.placeholder.com/64x64/8B4513/FFFFFF?text=House', fallbackIcon: '🏠', clearEffectImage: 'https://via.placeholder.com/32x32/CCCCCC/000000?text=Smoke' },
             2: { title: 'ワクもやエネルギー', description: 'ワクワク・もやもやは問いの原動力になる', message: '「君の感じた"もやもや"が、冒険の出発点」', iconImage: 'https://via.placeholder.com/64x64/228B22/FFFFFF?text=Forest', fallbackIcon: '🌲', clearEffectImage: 'https://via.placeholder.com/32x32/8B4513/FFFFFF?text=Animal' },
@@ -264,6 +251,7 @@
         let currentUserId = null;
         let userProgress = {}; 
         let currentStageIdForModal = null;
+        let currentUser = null; 
 
         function createSkyObjects() {
             skyObjectsContainer.innerHTML = ''; 
@@ -288,82 +276,229 @@
             }
         }
         
+        const authContainer = document.createElement('div'); 
+        authContainer.id = 'auth-section'; 
+        authContainer.style.position = 'fixed';
+        authContainer.style.top = '70px'; 
+        authContainer.style.left = '10px';
+        authContainer.style.padding = '10px';
+        authContainer.style.background = 'rgba(44, 24, 16, 0.85)'; 
+        authContainer.style.border = '3px solid #654321';
+        authContainer.style.boxShadow = '3px 3px 0 rgba(0,0,0,0.3)';
+        authContainer.style.zIndex = '1050';
+        authContainer.style.color = '#F5DEB3';
+        authContainer.style.fontSize = '14px';
+        authContainer.style.maxWidth = '220px'; 
+
+        function createAuthInput(type, placeholder) {
+            const input = document.createElement('input');
+            input.type = type;
+            input.placeholder = placeholder;
+            input.style.display = 'block';
+            input.style.width = 'calc(100% - 10px)';
+            input.style.padding = '8px';
+            input.style.marginBottom = '8px';
+            input.style.border = '2px solid #654321';
+            input.style.background = '#F5DEB3';
+            input.style.color = '#654321';
+            input.style.fontFamily = "'DotGothic16', sans-serif";
+            return input;
+        }
+
+        function createAuthButton(text, onClick, bgColor = '#8B4513', borderColor = '#654321') {
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.onclick = onClick;
+            button.style.padding = '10px 15px';
+            button.style.background = bgColor;
+            button.style.color = '#F5DEB3';
+            button.style.border = `2px solid ${borderColor}`;
+            button.style.cursor = 'pointer';
+            button.style.fontFamily = "'DotGothic16', sans-serif";
+            button.style.fontSize = '14px';
+            button.style.width = '100%';
+            button.style.marginTop = '5px';
+            button.style.boxShadow = '2px 2px 0 rgba(0,0,0,0.2)';
+            button.onmouseover = () => button.style.transform = 'translate(-1px, -1px)';
+            button.onmouseout = () => button.style.transform = 'translate(0, 0)';
+            button.onmousedown = () => button.style.transform = 'translate(1px, 1px)';
+            return button;
+        }
+
+        function updateAuthUI(isLoggedIn) {
+            authContainer.innerHTML = ''; 
+
+            if (isLoggedIn && currentUser) {
+                const greeting = document.createElement('p');
+                greeting.textContent = `ようこそ、${currentUser.email.split('@')[0]} さん！`;
+                greeting.style.marginBottom = '10px';
+                greeting.style.fontWeight = 'bold';
+                authContainer.appendChild(greeting);
+                authContainer.appendChild(createAuthButton('ログアウト', signOutUser, '#DC143C', '#8B0000'));
+            } else {
+                const title = document.createElement('h3');
+                title.textContent = '冒険を始める';
+                title.style.marginBottom = '10px';
+                title.style.textAlign = 'center';
+                authContainer.appendChild(title);
+
+                const emailInput = createAuthInput('email', 'メールアドレス');
+                emailInput.id = 'auth-email';
+                authContainer.appendChild(emailInput);
+
+                const passwordInput = createAuthInput('password', 'パスワード (6文字以上)');
+                passwordInput.id = 'auth-password';
+                authContainer.appendChild(passwordInput);
+
+                authContainer.appendChild(createAuthButton('ログイン', signInUser, '#2196F3', '#1976D2'));
+                authContainer.appendChild(createAuthButton('新規登録', signUpNewUser, '#4CAF50', '#388E3C'));
+            }
+        }
+        document.body.appendChild(authContainer); 
+
+        async function signUpNewUser() {
+            if (!supabaseClient) { alert('データベース接続エラー'); return; }
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+
+            if (!email || !password) { alert('メールアドレスとパスワードを入力してください。'); return; }
+            if (password.length < 6) { alert('パスワードは6文字以上で入力してください。'); return; }
+
+            showLoading(true);
+            try {
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                });
+                if (error) throw error;
+                if (data.user && data.user.identities && data.user.identities.length > 0) { 
+                    alert('確認メールを送信しました。メール内のリンクをクリックして登録を完了してください。\n（Supabaseの設定でメール確認がオフの場合は、このままログインできます）');
+                    console.log('Sign up successful:', data.user);
+                    if (data.session) { 
+                        currentUser = data.user;
+                        currentUserId = data.user.id;
+                        await initializeAppLogic(); 
+                        updateAuthUI(true);
+                    } else { 
+                        updateAuthUI(false); 
+                    }
+                } else if(data.user && data.user.identities && data.user.identities.length === 0){
+                    alert('このメールアドレスは既に使用されています。ログインするか、別のメールアドレスをお試しください。');
+                }
+                 else {
+                     alert('登録処理中に予期せぬ状態になりました。');
+                }
+            } catch (error) {
+                console.error('Error signing up:', error.message);
+                alert(`登録エラー: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function signInUser() {
+            if (!supabaseClient) { alert('データベース接続エラー'); return; }
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+
+            if (!email || !password) { alert('メールアドレスとパスワードを入力してください。'); return; }
+
+            showLoading(true);
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+                if (error) throw error;
+                if (data.user) {
+                    alert(`${data.user.email.split('@')[0]} さん、ようこそ！`);
+                    currentUser = data.user;
+                    currentUserId = data.user.id;
+                    await initializeAppLogic(); 
+                    updateAuthUI(true);
+                }
+            } catch (error) {
+                console.error('Error signing in:', error.message);
+                alert(`ログインエラー: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function signOutUser() {
+            if (!supabaseClient) { alert('データベース接続エラー'); return; }
+            showLoading(true);
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+                alert('ログアウトしました。');
+                currentUser = null;
+                currentUserId = null;
+                userProgress = {}; 
+                await initializeAppLogic(); 
+                updateAuthUI(false);
+            } catch (error) {
+                console.error('Error signing out:', error.message);
+                alert(`ログアウトエラー: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function checkAuthState() {
+            if (!supabaseClient) { console.warn('Supabase not initialized for auth state check.'); updateAuthUI(false); showLoading(false); return; }
+            showLoading(true);
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            
+            if (error) {
+                console.error("Error getting session:", error.message);
+                currentUser = null;
+                currentUserId = null;
+                await initializeAppLogic();
+                updateAuthUI(false);
+                showLoading(false);
+                return;
+            }
+
+            if (session && session.user) {
+                console.log('User is signed in:', session.user);
+                currentUser = session.user;
+                currentUserId = session.user.id;
+                await initializeAppLogic(); 
+                updateAuthUI(true); 
+            } else {
+                console.log('User is not signed in.');
+                currentUser = null;
+                currentUserId = null;
+                await initializeAppLogic(); 
+                updateAuthUI(false);
+            }
+            showLoading(false);
+        }
+
+        async function initializeAppLogic() { 
+            if (currentUserId) {
+                userProgress = await fetchUserProgress(currentUserId);
+            } else {
+                for (let i = 1; i <= TOTAL_STAGES; i++) userProgress[i] = 'locked';
+            }
+            updateStageDisplay(); 
+        }
+        
         function showLoading(show) { loadingOverlay.style.display = show ? 'flex' : 'none'; }
         function getUserIdFromUrl() { const params = new URLSearchParams(window.location.search); return params.get('userId'); }
         
         async function fetchUserProgress(userId) { 
             showLoading(true); 
             console.log(`Fetching progress for userId: ${userId}`); 
-            // ▼ Supabaseからデータ取得 (実際の処理に置き換え) ▼
-            if (!supabaseClient) {
-                console.error('Supabase client is not initialized for fetching progress.');
-                showLoading(false);
-                // デフォルトのロック状態を返す
-                const defaultProgress = {};
-                for (let i = 1; i <= TOTAL_STAGES; i++) defaultProgress[i] = (i === 1 ? 'current' : 'locked');
-                return defaultProgress;
-            }
-            try {
-                const { data, error } = await supabaseClient
-                    .from('claft-quest') // あなたのテーブル名
-                    .select('stage_id, status')
-                    .eq('user_id', userId);
-
-                if (error) throw error;
-
-                const progress = {};
-                for (let i = 1; i <= TOTAL_STAGES; i++) {
-                    const record = data.find(r => r.stage_id === i);
-                    progress[i] = record ? record.status : (i === 1 ? 'current' : 'locked');
-                }
-                 // ユーザーの進捗レコードが一つもない場合 (新規ユーザーなど)
-                if (data.length === 0) {
-                     progress[1] = 'current';
-                     for (let i = 2; i <= TOTAL_STAGES; i++) progress[i] = 'locked';
-                     // 必要であれば、新規ユーザーのために初期レコードをDBに保存する処理をここに追加しても良い
-                }
-                console.log('Progress fetched from Supabase:', progress);
-                return progress;
-            } catch (error) {
-                console.error('Error fetching user progress from Supabase:', error.message);
-                // エラー時はデフォルトの進捗（ステージ1がcurrent）を返すなどのフォールバック
-                const defaultProgress = {};
-                for (let i = 1; i <= TOTAL_STAGES; i++) defaultProgress[i] = (i === 1 ? 'current' : 'locked');
-                return defaultProgress;
-            } finally {
-                showLoading(false);
-            }
-            // ▲ Supabaseからデータ取得 ▲
+            if (!supabaseClient) { console.error('Supabase client is not initialized for fetching progress.'); showLoading(false); const defaultProgress = {}; for (let i = 1; i <= TOTAL_STAGES; i++) defaultProgress[i] = (i === 1 && userId ? 'current' : 'locked'); return defaultProgress; }
+            try { const { data, error } = await supabaseClient.from('claft-quest').select('stage_id, status').eq('user_id', userId); if (error) throw error; const progress = {}; for (let i = 1; i <= TOTAL_STAGES; i++) { const record = data.find(r => r.stage_id === i); progress[i] = record ? record.status : (i === 1 ? 'current' : 'locked'); } if (data.length === 0) { progress[1] = 'current'; for (let i = 2; i <= TOTAL_STAGES; i++) progress[i] = 'locked'; } console.log('Progress fetched from Supabase:', progress); return progress; } catch (error) { console.error('Error fetching user progress from Supabase:', error.message); const defaultProgress = {}; for (let i = 1; i <= TOTAL_STAGES; i++) defaultProgress[i] = (i === 1 && userId ? 'current' : 'locked'); return defaultProgress; } finally { showLoading(false); }
         }
-
         async function saveUserProgress(userId, stageId, newStatus) { 
             showLoading(true); 
             console.log(`Saving progress for userId: ${userId}, stageId: ${stageId}, status: ${newStatus}`); 
-            // ▼ Supabaseへデータ保存 (実際の処理に置き換え) ▼
-            if (!supabaseClient) {
-                console.error('Supabase client is not initialized for saving progress.');
-                showLoading(false);
-                return false;
-            }
-            try {
-                // Supabaseでは UPSERT (Update or Insert) を使うと便利
-                const { data, error } = await supabaseClient
-                    .from('claft-quest')
-                    .upsert({ user_id: userId, stage_id: stageId, status: newStatus }, { onConflict: 'user_id, stage_id' })
-                    .select(); // select() を付けると、操作後のレコードが返る
-
-                if (error) throw error;
-                
-                console.log('Progress saved to Supabase:', data);
-                userProgress[stageId] = newStatus; // ローカルの進捗も更新
-                return true;
-            } catch (error) {
-                console.error('Error saving user progress to Supabase:', error.message);
-                return false;
-            } finally {
-                showLoading(false);
-            }
-            // ▲ Supabaseへデータ保存 ▲
+            if (!supabaseClient) { console.error('Supabase client is not initialized for saving progress.'); showLoading(false); return false; }
+            try { const { data, error } = await supabaseClient.from('claft-quest').upsert({ user_id: userId, stage_id: stageId, status: newStatus }, { onConflict: 'user_id, stage_id' }).select(); if (error) throw error; console.log('Progress saved to Supabase:', data); userProgress[stageId] = newStatus; return true; } catch (error) { console.error('Error saving user progress to Supabase:', error.message); return false; } finally { showLoading(false); }
         }
         
         function updateStageDisplay() { 
@@ -384,24 +519,15 @@
                 const heroFace = stageNode.querySelector('.hero-face'); 
                 if (heroFace) { if (status === 'current') { heroFace.style.display = 'block'; currentStageExists = true; } else { heroFace.style.display = 'none'; } } 
             } 
-            if (allStagesCompleted) { mainQuestButton.textContent = '🎉 全ての冒険を達成！'; mainQuestButton.disabled = true; } 
-            else if (!currentStageExists && !allStagesCompleted && Object.keys(userProgress).length > 0) { // 進捗データはあるがcurrentがない場合
+            if (allStagesCompleted && Object.keys(userProgress).length >= TOTAL_STAGES ) { mainQuestButton.textContent = '🎉 全ての冒険を達成！'; mainQuestButton.disabled = true; }  // userProgressがロードされてから全クリア判定
+            else if (!currentStageExists && !allStagesCompleted && Object.keys(userProgress).length > 0) { 
                 mainQuestButton.textContent = '❓ 次のステージへ'; 
-                mainQuestButton.disabled = false; // または最初の未クリアを開くなど検討
-                 // このケースは通常、DBデータが不正か、初期化ロジックの漏れ。
-                 // 例えば、全ステージlockedでcurrentがない場合など。
-                 // 一旦、最初のlockedステージをcurrentにするなどのフォールバックも考えられる。
+                mainQuestButton.disabled = false; 
                  const firstLocked = Object.entries(userProgress).find(([id, stat]) => stat === 'locked');
-                 if (firstLocked) {
-                     console.warn(`No current stage found, attempting to set stage ${firstLocked[0]} as current.`);
-                     // userProgress[parseInt(firstLocked[0])] = 'current'; // これをDBにも保存する必要がある
-                     // updateStageDisplay(); // 再帰呼び出しは注意
-                 } else {
-                     mainQuestButton.textContent = '🚀 新たな冒険？';
-                 }
-
-            } else if (!currentStageExists && allStagesCompleted) { // これは上のallStagesCompletedでキャッチされるはず
-                 mainQuestButton.textContent = '🎉 全てクリア！'; mainQuestButton.disabled = true;
+                 if (firstLocked) { console.warn(`No current stage found, attempting to set stage ${firstLocked[0]} as current.`); } 
+                 else { mainQuestButton.textContent = '🚀 新たな冒険？'; }
+            } else if (!currentStageExists && allStagesCompleted && Object.keys(userProgress).length === 0 ) { // 初期状態など
+                 mainQuestButton.textContent = '🚀 冒険を始めよう！'; mainQuestButton.disabled = false;
             }
             else { mainQuestButton.textContent = '🔥 次の冒険へ進む！'; mainQuestButton.disabled = false; }
         }
@@ -417,36 +543,19 @@
         stageModal.addEventListener('click', (e) => { if (e.target === stageModal) closeStageModal(); });
         modalVideoBtn.addEventListener('click', () => { alert(`ステージ ${currentStageIdForModal} の動画コンテンツを表示します。（実装は別途）`); });
         modalQuestBtn.addEventListener('click', async () => { if (!currentStageIdForModal || userProgress[currentStageIdForModal] !== 'current') return; const success = await saveUserProgress(currentUserId, currentStageIdForModal, 'completed'); if (success) { userProgress[currentStageIdForModal] = 'completed'; const nextStageId = currentStageIdForModal + 1; if (nextStageId <= TOTAL_STAGES) { const nextSuccess = await saveUserProgress(currentUserId, nextStageId, 'current'); if (nextSuccess) { userProgress[nextStageId] = 'current'; } else { alert('次のステージの解放に失敗しました。'); } } updateStageDisplay(); closeStageModal(); setTimeout(() => { alert(`ステージ ${currentStageIdForModal} クリア！🎉 ${nextStageId <= TOTAL_STAGES && userProgress[nextStageId] === 'current' ? '次の冒険へ進もう！' : '全ての冒険を達成しました！'}`); }, 100); } else { alert('進捗の保存に失敗しました。'); } });
-        mainQuestButton.addEventListener('click', () => { const currentStageEntry = Object.entries(userProgress).find(([_, status]) => status === 'current'); if (currentStageEntry) { openStageModal(parseInt(currentStageEntry[0])); } else if (Object.values(userProgress).every(s => s === 'completed')) {} else { /* 最初の未クリアを開くなどのロジックをここに追加検討 */ const firstNonCompleted = Object.entries(userProgress).find(([id, stat]) => stat !== 'completed'); if (firstNonCompleted) { openStageModal(parseInt(firstNonCompleted[0])); } else { alert('冒険を始める準備ができていません。ページをリロードしてください。');} } });
+        mainQuestButton.addEventListener('click', () => { const currentStageEntry = Object.entries(userProgress).find(([_, status]) => status === 'current'); if (currentStageEntry) { openStageModal(parseInt(currentStageEntry[0])); } else if (Object.values(userProgress).every(s => s === 'completed') && Object.keys(userProgress).length >= TOTAL_STAGES) {} else { const firstNonCompletedOrLocked = Object.entries(userProgress).find(([id, stat]) => stat === 'locked' || stat === 'current'); if (firstNonCompletedOrLocked) { openStageModal(parseInt(firstNonCompletedOrLocked[0])); } else if (Object.keys(userProgress).length === 0) { openStageModal(1); /* 初期状態でデータがない場合はステージ1を開く試み */ } else { alert('冒険を始める準備ができていません。');} } });
         document.getElementById('adventureLogBtn').addEventListener('click', () => { let logText = "📖 これまでの冒険の記録\n\n"; let completedCount = 0; for (let i = 1; i <= TOTAL_STAGES; i++) { if (userProgress[i] === 'completed') { logText += `ステージ${i}: ${stageStaticData[i].title} - クリア済み\n`; completedCount++; } else if (userProgress[i] === 'current') { logText += `ステージ${i}: ${stageStaticData[i].title} - 挑戦中\n`; } } if (completedCount === 0 && !Object.values(userProgress).some(s => s === 'current')) { logText += 'まだ冒険は始まったばかりです！'; } alert(logText); });
 
         async function initializeApp() { 
             createSkyObjects(); 
-            currentUserId = getUserIdFromUrl(); 
-            if (!currentUserId) { 
-                // PWAとして起動した場合など、URLにuserIdがない場合は認証状態を確認
-                if (supabaseClient) { // supabaseClientが初期化されていれば
-                    const { data: { session } } = await supabaseClient.auth.getSession();
-                    if (session && session.user) {
-                        currentUserId = session.user.id;
-                        console.log('User session found, userId:', currentUserId);
-                    } else {
-                        console.warn('User session not found. Using default or prompting login.');
-                        // ここでログインを促すUIを表示するか、テストユーザーIDを使う
-                        currentUserId = 'testUser001'; // 仮
-                    }
-                } else {
-                     currentUserId = 'testUser001'; 
-                     console.warn('Supabase client not ready, using default testUser001 for userId.');
-                }
+            // currentUserId = getUserIdFromUrl(); // URLパラメータからの取得は一旦コメントアウト
+            if (supabaseClient) { 
+                await checkAuthState(); // 認証状態を確認し、currentUserIdを設定、その後initializeAppLogicを呼び出す
+            } else {
+                 console.warn('Supabase client not ready, using default testUser001 for userId.');
+                 currentUserId = 'testUser001'; // Supabase未初期化時のフォールバック
+                 await initializeAppLogic(); // この場合もロジックは実行
             }
-            if (!currentUserId) { // それでもuserIdがなければエラー
-                 alert('ユーザー情報を取得できませんでした。');
-                 showLoading(false);
-                 return;
-            }
-            userProgress = await fetchUserProgress(currentUserId); 
-            updateStageDisplay(); 
         }
         
         if ('serviceWorker' in navigator) {
