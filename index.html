@@ -329,7 +329,27 @@
     </div>
     <button class="quest-button" id="mainQuestButton">🔥 次の冒険へ進む！</button>
     <div class="modal" id="stageModal"> <div class="modal-content"> <button class="modal-close" id="modalCloseBtn">×</button> <h2 class="modal-title" id="modalStageTitle"></h2> <p class="modal-description" id="modalStageDescription"></p> <div class="modal-message" id="modalStageMessage"></div> <div class="modal-buttons"> <button class="modal-button video" id="modalVideoBtn">🎬 動画を見る</button> <button class="modal-button quest" id="modalQuestBtn">⚔️ クエストに挑む</button> </div> </div> </div>
-    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
+　　<script>
+    const SUPABASE_PROJECT_URL = https://laqvpxecqvlufboquffe.supabase.co;
+    const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcXZweGVjcXZsdWZib3F1ZmZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MzYwNjgsImV4cCI6MjA2NDAxMjA2OH0.IRkg1miEpOGIFQMnno_P0hsMe1IgwCi2kl_kNcrmZTw;
+
+    let supabase; // この変数を後で使います
+
+    if (!SUPABASE_PROJECT_URL || !SUPABASE_ANON_KEY) {
+        console.error("Supabase URLとAnon Keyが設定されていません。");
+        alert("アプリの設定エラーです。管理者にお問い合わせください。");
+    } else {
+        try {
+            // Supabaseクライアントを作成（これでSupabaseと通信できるようになる）
+            supabase = supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+            console.log('Supabaseクライアントの初期化に成功しました！');
+        } catch (error) {
+            console.error('Supabaseクライアントの初期化中にエラーが発生しました:', error);
+            alert('アプリの起動に失敗しました。ページをリロードしてみてください。');
+        }
+    }
+</script>
     <script>
         // グローバル設定
         const ADALO_API_ENDPOINT = 'YOUR_ADALO_ENDPOINT/collections/YOUR_PROGRESS_COLLECTION_ID';
